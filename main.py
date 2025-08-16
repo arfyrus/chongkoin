@@ -81,7 +81,7 @@ def my_house(pos, i):
 #         print('+----', end='')
 #     print('+     ')
 
-def print_board(stdscr, houses):
+def line_print_board(stdscr, houses):
     stdscr.addch(curses.ACS_ULCORNER)
     for _ in range(4):
         stdscr.addch(curses.ACS_HLINE)
@@ -192,6 +192,44 @@ def print_board(stdscr, houses):
     #     print('+----', end='')
     # print('+     ')
 
+def print_board(stdscr, houses):
+    # Horizontal lines
+    stdscr.hline(0, 0, curses.ACS_BSBS, (board_size + 2) * 5)
+    stdscr.hline(8, 0, curses.ACS_BSBS, (board_size + 2) * 5)
+    stdscr.hline(4, 5, curses.ACS_BSBS, (board_size) * 5)
+
+    # Vertical lines
+    stdscr.addch(0, 0, curses.ACS_BSSB)
+    stdscr.vline(1, 0, curses.ACS_SBSB, 7)
+    stdscr.addch(8, 0, curses.ACS_SSBB)
+    for i in range(board_size):
+        stdscr.addch(0, (i + 1) * 5, curses.ACS_BSSS)
+        stdscr.vline(1, (i + 1) * 5, curses.ACS_SBSB, 7)
+        stdscr.addch(8, (i + 1) * 5, curses.ACS_SSBS)
+    stdscr.addch(0, (board_size + 1) * 5, curses.ACS_BSSS)
+    stdscr.vline(1, (board_size + 1) * 5, curses.ACS_SBSB, 7)
+    stdscr.addch(8, (board_size + 1) * 5, curses.ACS_SSBS)
+    stdscr.addch(0, (board_size + 2) * 5, curses.ACS_BBSS)
+    stdscr.vline(1, (board_size + 2) * 5, curses.ACS_SBSB, 7)
+    stdscr.addch(8, (board_size + 2) * 5, curses.ACS_SBBS)
+
+    # Intersection points
+    stdscr.addch(4, 5, curses.ACS_SSSB)
+    for i in range(board_size - 1):
+        stdscr.addch(4, (i + 2) * 5, curses.ACS_SSSS)
+    stdscr.addch(4, (board_size + 1) * 5, curses.ACS_SBSS)
+
+    # Values
+    ## Mothers
+    stdscr.addstr(4, 2, f'{houses[index(-1, 0)]:>2}')
+    stdscr.addstr(4, (board_size + 1) * 5 + 2, f'{houses[index(-1, 1)]:>2}')
+
+    ## Children
+    for i in range(board_size):
+        stdscr.addstr(2, (i + 1) * 5 + 2, f'{houses[index(board_size - i - 1, 0)]:>2}')
+        stdscr.addstr(6, (i + 1) * 5 + 2, f'{houses[index(i, 1)]:>2}')
+
+
 def move(houses, pos):
     if houses[pos] <= 0:
         print("Move again!")
@@ -242,46 +280,52 @@ def check_empty(houses):
 
     return 'N'
 
-def old_main(stdscr):
-    player = 'A'
+# def old_main(stdscr):
+#     player = 'A'
+#     # houses = [
+#     #     4, 4, 4, 4, 4, 4,
+#     #     0,
+#     #     0, 0, 1, 0, 0, 0,
+#     #     9,
+#     # ]
+#
+#     houses = ([4] * board_size + [0]) * 2
+#
+#     while check_empty(houses) == 'N':
+#         print_board(houses)
+#
+#         num = int(input("Position: ")) if player == 'A' else rd.randint(0, board_size - 1)
+#
+#         again = move(houses, num + (board_size if player == 'A' else 0))
+#         if not again:
+#             player = swap_player(player)
+#
+#     print_board(houses)
+#
+#     winner = check_empty(houses)
+#     for i in range(board_size):
+#         side = 0 if winner == 'A' else 1
+#         houses[index(-1, side)] += houses[index(i, side)]
+#         houses[index(i, side)] = 0
+#
+#     print_board(houses)
+#
+#     if houses[index(-1, 1)] > houses[index(-1, 0)]:
+#         print("You win!")
+#
+#     elif houses[index(-1, 0)] > houses[index(-1, 1)]:
+#         print("You lose!")
+#
+#     elif houses[index(-1, 0)] == houses[index(-1, 1)]:
+#         print("Tie!")
+
+def main(stdscr):
     # houses = [
     #     4, 4, 4, 4, 4, 4,
     #     0,
     #     0, 0, 1, 0, 0, 0,
     #     9,
     # ]
-
-    houses = ([4] * board_size + [0]) * 2
-
-    while check_empty(houses) == 'N':
-        print_board(houses)
-
-        num = int(input("Position: ")) if player == 'A' else rd.randint(0, board_size - 1)
-
-        again = move(houses, num + (board_size if player == 'A' else 0))
-        if not again:
-            player = swap_player(player)
-
-    print_board(houses)
-
-    winner = check_empty(houses)
-    for i in range(board_size):
-        side = 0 if winner == 'A' else 1
-        houses[index(-1, side)] += houses[index(i, side)]
-        houses[index(i, side)] = 0
-
-    print_board(houses)
-
-    if houses[index(-1, 1)] > houses[index(-1, 0)]:
-        print("You win!")
-
-    elif houses[index(-1, 0)] > houses[index(-1, 1)]:
-        print("You lose!")
-
-    elif houses[index(-1, 0)] == houses[index(-1, 1)]:
-        print("Tie!")
-
-def main(stdscr):
     houses = ([4] * board_size + [0]) * 2
     print_board(stdscr, houses)
     stdscr.refresh()
