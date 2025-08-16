@@ -99,7 +99,7 @@ def move(houses, pos):
             print("One more move!")
             return True
 
-        if pieces == 0 and houses[spot(pos + i)] == 1 and my_house(pos, i) and house[opposite(spot(pos + i))] > 0:
+        if pieces == 0 and houses[spot(pos + i)] == 1 and my_house(pos, i) and houses[opposite(spot(pos + i))] > 0:
             print("Capture!")
             piece_num = 1 + houses[opposite(spot(pos + i))]
             houses[opposite(spot(pos + i))] = 0
@@ -149,8 +149,24 @@ def main():
         if not again:
             player = swap_player(player)
 
-    print(f"{check_empty(houses)} wins!")
     print_board(houses)
+
+    winner = check_empty(houses)
+    for i in range(board_size):
+        side = 0 if winner == 'A' else 1
+        houses[index(-1, side)] += houses[index(i, side)]
+        houses[index(i, side)] = 0
+
+    print_board(houses)
+
+    if houses[index(-1, 1)] > houses[index(-1, 0)]:
+        print("You win!")
+
+    elif houses[index(-1, 0)] > houses[index(-1, 1)]:
+        print("You lose!")
+
+    elif houses[index(-1, 0)] == houses[index(-1, 1)]:
+        print("Tie!")
 
 if __name__ == '__main__':
     main()
