@@ -65,6 +65,16 @@ def print_board(houses):
         print('+----', end='')
     print('+----+')
 
+    print('     ', end='')
+    for i in range(board_size):
+        print(f'| {i + 1:>2} ', end='')
+    print('|     ')
+
+    print('     ', end='')
+    for _ in range(board_size):
+        print('+----', end='')
+    print('+     ')
+
 def move(houses, pos):
     if houses[pos] < 0:
         return
