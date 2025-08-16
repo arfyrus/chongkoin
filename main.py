@@ -20,6 +20,9 @@ def opposite(x):
 def swap_player(player):
     return 'A' if player == 'B' else 'B'
 
+def my_house(pos, i):
+    return ((pos < 7) == (spot(pos + i) < 7))
+
 def print_board(houses):
     print('+----', end='')
     for _ in range(board_size):
@@ -86,7 +89,7 @@ def move(houses, pos):
     houses[pos] = 0
     while pieces > 0:
         i += 1
-        if is_mom(pos + i) and not ((pos < 7) == (spot(pos + i) < 7)):
+        if is_mom(pos + i) and not my_house(pos, i):
             continue
         else:
             houses[spot(pos + i)] += 1
@@ -95,6 +98,13 @@ def move(houses, pos):
         if pieces == 0 and is_mom(pos + i) and check_empty(houses) == 'N':
             print("One more move!")
             return True
+
+        if pieces == 0 and houses[spot(pos + i)] == 1 and my_house(pos, i) and house[opposite(spot(pos + i))] > 0:
+            print("Capture!")
+            piece_num = 1 + houses[opposite(spot(pos + i))]
+            houses[opposite(spot(pos + i))] = 0
+            houses[spot(pos + i)] = 0
+            houses[index(-1, (0 if pos < 7 else 1))] += piece_num
 
     return False
 
@@ -124,8 +134,8 @@ def main():
     # houses = [
     #     4, 4, 4, 4, 4, 4,
     #     0,
-    #     0, 0, 0, 0, 0, 0,
-    #     0,
+    #     0, 0, 1, 0, 0, 0,
+    #     9,
     # ]
 
     houses = ([4] * board_size + [0]) * 2
@@ -134,7 +144,6 @@ def main():
         print_board(houses)
 
         num = int(input("Position: ")) if player == 'A' else rd.randint(0, board_size - 1)
-        # num = rd.randint(0, board_size - 1)
 
         again = move(houses, num + (board_size if player == 'A' else 0))
         if not again:
