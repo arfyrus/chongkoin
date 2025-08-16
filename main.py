@@ -1,4 +1,6 @@
 import random as rd
+import curses
+
 board_size = 6
 # houses = [0] * (board_size + 1) * 2
 
@@ -23,61 +25,172 @@ def swap_player(player):
 def my_house(pos, i):
     return ((pos < 7) == (spot(pos + i) < 7))
 
-def print_board(houses):
-    print('+----', end='')
-    for _ in range(board_size):
-        print('+----', end='')
-    print('+----+')
+# def old_print_board(houses):
+#     print('+----', end='')
+#     for _ in range(board_size):
+#         print('+----', end='')
+#     print('+----+')
+#
+#     print('|    ', end='')
+#     for _ in range(board_size):
+#         print('|    ', end='')
+#     print('|    |')
+#
+#     print('|    ', end='')
+#     for i in reversed(range(board_size)):
+#         print(f'| {houses[index(i, 0)]:>2} ', end='')
+#     print('|    |')
+#
+#     print('|    ', end='')
+#     for _ in range(board_size):
+#         print('|    ', end='')
+#     print('|    |')
+#
+#     print(f'| {houses[index(-1, 0)]:>2} ', end='')
+#     for _ in range(board_size):
+#         print('+----', end='')
+#     print(f'+ {houses[index(-1, 1)]:>2} |')
+#
+#     print('|    ', end='')
+#     for _ in range(board_size):
+#         print('|    ', end='')
+#     print('|    |')
+#
+#     print('|    ', end='')
+#     for i in range(board_size):
+#         print(f'| {houses[index(i, 1)]:>2} ', end='')
+#     print('|    |')
+#
+#     print('|    ', end='')
+#     for _ in range(board_size):
+#         print('|    ', end='')
+#     print('|    |')
+#
+#     print('+----', end='')
+#     for _ in range(board_size):
+#         print('+----', end='')
+#     print('+----+')
+#
+#     print('     ', end='')
+#     for i in range(board_size):
+#         print(f'| {i + 1:>2} ', end='')
+#     print('|     ')
+#
+#     print('     ', end='')
+#     for _ in range(board_size):
+#         print('+----', end='')
+#     print('+     ')
 
-    print('|    ', end='')
+def print_board(stdscr, houses):
+    stdscr.addch(curses.ACS_ULCORNER)
+    for _ in range(4):
+        stdscr.addch(curses.ACS_HLINE)
     for _ in range(board_size):
-        print('|    ', end='')
-    print('|    |')
+        stdscr.addch(curses.ACS_TTEE)
+        for _ in range(4):
+            stdscr.addch(curses.ACS_HLINE)
+    stdscr.addch(curses.ACS_TTEE)
+    for _ in range(4):
+        stdscr.addch(curses.ACS_HLINE)
+    stdscr.addch(curses.ACS_URCORNER)
+    stdscr.addch('\n')
 
-    print('|    ', end='')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    for _ in range(board_size):
+        stdscr.addch(curses.ACS_VLINE)
+        stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
+
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
     for i in reversed(range(board_size)):
-        print(f'| {houses[index(i, 0)]:>2} ', end='')
-    print('|    |')
+        stdscr.addch(curses.ACS_VLINE)
+        stdscr.addstr(f' {houses[index(i, 0)]:>2} ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
 
-    print('|    ', end='')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
     for _ in range(board_size):
-        print('|    ', end='')
-    print('|    |')
+        stdscr.addch(curses.ACS_VLINE)
+        stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
 
-    print(f'| {houses[index(-1, 0)]:>2} ', end='')
-    for _ in range(board_size):
-        print('+----', end='')
-    print(f'+ {houses[index(-1, 1)]:>2} |')
-
-    print('|    ', end='')
-    for _ in range(board_size):
-        print('|    ', end='')
-    print('|    |')
-
-    print('|    ', end='')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr(f' {houses[index(-1, 0)]:>2} ')
     for i in range(board_size):
-        print(f'| {houses[index(i, 1)]:>2} ', end='')
-    print('|    |')
+        if i == 0:
+            stdscr.addch(curses.ACS_SSSB)
+        else:
+            stdscr.addch(curses.ACS_SSSS)
+        for _ in range(4):
+            stdscr.addch(curses.ACS_HLINE)
+    stdscr.addch(curses.ACS_SBSS)
+    stdscr.addstr(f' {houses[index(-1, 1)]:>2} ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
 
-    print('|    ', end='')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
     for _ in range(board_size):
-        print('|    ', end='')
-    print('|    |')
+        stdscr.addch(curses.ACS_VLINE)
+        stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
 
-    print('+----', end='')
-    for _ in range(board_size):
-        print('+----', end='')
-    print('+----+')
-
-    print('     ', end='')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
     for i in range(board_size):
-        print(f'| {i + 1:>2} ', end='')
-    print('|     ')
+        stdscr.addch(curses.ACS_VLINE)
+        stdscr.addstr(f' {houses[index(i, 1)]:>2} ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
 
-    print('     ', end='')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
     for _ in range(board_size):
-        print('+----', end='')
-    print('+     ')
+        stdscr.addch(curses.ACS_VLINE)
+        stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addstr('    ')
+    stdscr.addch(curses.ACS_VLINE)
+    stdscr.addch('\n')
+
+    stdscr.addch(curses.ACS_SSBB)
+    for _ in range(4):
+        stdscr.addch(curses.ACS_HLINE)
+    for _ in range(board_size):
+        stdscr.addch(curses.ACS_SSBS)
+        for _ in range(4):
+            stdscr.addch(curses.ACS_HLINE)
+    stdscr.addch(curses.ACS_SSBS)
+    for _ in range(4):
+        stdscr.addch(curses.ACS_HLINE)
+    stdscr.addch(curses.ACS_SBBS)
+    stdscr.addch('\n')
+
+    # print('     ', end='')
+    # for i in range(board_size):
+    #     print(f'| {i + 1:>2} ', end='')
+    # print('|     ')
+    #
+    # print('     ', end='')
+    # for _ in range(board_size):
+    #     print('+----', end='')
+    # print('+     ')
 
 def move(houses, pos):
     if houses[pos] <= 0:
@@ -129,7 +242,7 @@ def check_empty(houses):
 
     return 'N'
 
-def main():
+def old_main(stdscr):
     player = 'A'
     # houses = [
     #     4, 4, 4, 4, 4, 4,
@@ -168,5 +281,18 @@ def main():
     elif houses[index(-1, 0)] == houses[index(-1, 1)]:
         print("Tie!")
 
+def main(stdscr):
+    houses = ([4] * board_size + [0]) * 2
+    print_board(stdscr, houses)
+    stdscr.refresh()
+
 if __name__ == '__main__':
-    main()
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    curses.curs_set(0)
+    main(stdscr)
+    stdscr.getch()
+    curses.echo()
+    curses.nocbreak()
+    curses.endwin()
