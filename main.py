@@ -1,3 +1,4 @@
+import random as rd
 board_size = 6
 # houses = [0] * (board_size + 1) * 2
 
@@ -76,8 +77,9 @@ def print_board(houses):
     print('+     ')
 
 def move(houses, pos):
-    if houses[pos] < 0:
-        return
+    if houses[pos] <= 0:
+        print("Move again!")
+        return True
 
     i = 0
     pieces = houses[pos]
@@ -90,24 +92,55 @@ def move(houses, pos):
             houses[spot(pos + i)] += 1
         pieces -= 1
 
-        if pieces == 0 and is_mom(pos + i):
+        if pieces == 0 and is_mom(pos + i) and check_empty(houses) == 'N':
             print("One more move!")
+            return True
+
+    return False
+
+def check_empty(houses):
+    a_win = True
+    for i in range(board_size):
+        if houses[i + board_size + 1] > 0:
+            a_win = False
+            break
+
+    if a_win:
+        return 'A'
+
+    b_win = True
+    for i in range(board_size):
+        if houses[i] > 0:
+            b_win = False
+            break
+
+    if b_win:
+        return 'B'
+
+    return 'N'
 
 def main():
     player = 'A'
     # houses = [
     #     4, 4, 4, 4, 4, 4,
     #     0,
-    #     4, 4, 4, 4, 4, 14,
+    #     0, 0, 0, 0, 0, 0,
     #     0,
     # ]
 
     houses = ([4] * board_size + [0]) * 2
-    print_board(houses)
 
-    num = int(input("Position: "))
+    while check_empty(houses) == 'N':
+        print_board(houses)
 
-    move(houses, num + (board_size if player == 'A' else 0))
+        num = int(input("Position: ")) if player == 'A' else rd.randint(0, board_size - 1)
+        # num = rd.randint(0, board_size - 1)
+
+        again = move(houses, num + (board_size if player == 'A' else 0))
+        if not again:
+            player = swap_player(player)
+
+    print(f"{check_empty(houses)} wins!")
     print_board(houses)
 
 if __name__ == '__main__':
