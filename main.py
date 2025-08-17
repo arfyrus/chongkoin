@@ -6,6 +6,14 @@ board_size = 6
 grid = {
     'height': 3,
     'width': 5,
+    'message': 1,
+}
+
+caption = {
+    0: 'It\'s your turn!',
+    1: 'Invalid move!',
+    2: 'Move again!',
+    3: 'Capture! Press to continue.',
 }
 
 def index(x, y):
@@ -24,37 +32,48 @@ def opposite(x):
     return (board_size * 2) - x
 
 def swap_player(player):
-    return 'A' if player == 'B' else 'B'
+    return not player
 
 def my_house(pos, i):
     return ((pos < 7) == (spot(pos + i) < 7))
 
-def print_board(stdscr, houses, choice):
+def print_board(stdscr, houses, choice, message):
     # Horizontal lines
     stdscr.hline(0, 0, curses.ACS_BSBS, (board_size + 2) * (grid['width'] + 1))
-    stdscr.hline(grid['height'] * 2 + 2, 0, curses.ACS_BSBS, (board_size + 2) * (grid['width'] + 1))
     stdscr.hline(grid['height'] + 1, grid['width'] + 1, curses.ACS_BSBS, (board_size) * (grid['width'] + 1))
+    stdscr.hline(grid['height'] * 2 + 2, 0, curses.ACS_BSBS, (board_size + 2) * (grid['width'] + 1))
+    stdscr.hline(grid['height'] * 2 + 3 + grid['message'], 0, curses.ACS_BSBS, (board_size + 2) * (grid['width'] + 1))
 
     # Vertical lines
-    stdscr.addch(0, 0, curses.ACS_BSSB)
-    stdscr.vline(1, 0, curses.ACS_SBSB, grid['height'] * 2 + 1)
-    stdscr.addch(grid['height'] * 2 + 2, 0, curses.ACS_SSBB)
+    stdscr.vline(1, 0, curses.ACS_SBSB, grid['height'] * 2 + 2 + grid['message'])
     for i in range(board_size):
-        stdscr.addch(0, (i + 1) * (grid['width'] + 1), curses.ACS_BSSS)
+        # stdscr.addch(0, (i + 1) * (grid['width'] + 1), curses.ACS_BSSS)
         stdscr.vline(1, (i + 1) * (grid['width'] + 1), curses.ACS_SBSB, grid['height'] * 2 + 1)
-        stdscr.addch(grid['height'] * 2 + 2, (i + 1) * (grid['width'] + 1), curses.ACS_SSBS)
-    stdscr.addch(0, (board_size + 1) * (grid['width'] + 1), curses.ACS_BSSS)
+        # stdscr.addch(grid['height'] * 2 + 2, (i + 1) * (grid['width'] + 1), curses.ACS_SSBS)
     stdscr.vline(1, (board_size + 1) * (grid['width'] + 1), curses.ACS_SBSB, grid['height'] * 2 + 1)
-    stdscr.addch(grid['height'] * 2 + 2, (board_size + 1) * (grid['width'] + 1), curses.ACS_SSBS)
-    stdscr.addch(0, (board_size + 2) * (grid['width'] + 1), curses.ACS_BBSS)
-    stdscr.vline(1, (board_size + 2) * (grid['width'] + 1), curses.ACS_SBSB, grid['height'] * 2 + 1)
-    stdscr.addch(grid['height'] * 2 + 2, (board_size + 2) * (grid['width'] + 1), curses.ACS_SBBS)
+    stdscr.vline(1, (board_size + 2) * (grid['width'] + 1), curses.ACS_SBSB, grid['height'] * 2 + 2 + grid['message'])
 
     # Intersection points
+    ## Corners
+    stdscr.addch(0, 0, curses.ACS_BSSB)
+    stdscr.addch(0, (board_size + 2) * (grid['width'] + 1), curses.ACS_BBSS)
+    stdscr.addch(grid['height'] * 2 + 3 + grid['message'], (board_size + 2) * (grid['width'] + 1), curses.ACS_SBBS)
+    stdscr.addch(grid['height'] * 2 + 3 + grid['message'], 0, curses.ACS_SSBB)
+
+    ## Tees
+    stdscr.addch(0, (board_size + 1) * (grid['width'] + 1), curses.ACS_BSSS)
+    stdscr.addch(grid['height'] * 2 + 2, (board_size + 1) * (grid['width'] + 1), curses.ACS_SSBS)
+    stdscr.addch(grid['height'] + 1, (board_size + 1) * (grid['width'] + 1), curses.ACS_SBSS)
     stdscr.addch(grid['height'] + 1, grid['width'] + 1, curses.ACS_SSSB)
+    for i in range(board_size):
+        stdscr.addch(0, (i + 1) * (grid['width'] + 1), curses.ACS_BSSS)
+        stdscr.addch(grid['height'] * 2 + 2, (i + 1) * (grid['width'] + 1), curses.ACS_SSBS)
+    stdscr.addch(grid['height'] * 2 + 2, (board_size + 2) * (grid['width'] + 1), curses.ACS_SBSS)
+    stdscr.addch(grid['height'] * 2 + 2, 0, curses.ACS_SSSB)
+
+    ## Crosses
     for i in range(board_size - 1):
         stdscr.addch(grid['height'] + 1, (i + 2) * (grid['width'] + 1), curses.ACS_SSSS)
-    stdscr.addch(grid['height'] + 1, (board_size + 1) * (grid['width'] + 1), curses.ACS_SBSS)
 
     # Values
     ## Mothers
@@ -75,11 +94,13 @@ def print_board(stdscr, houses, choice):
 
         stdscr.addstr(grid['height'] + 1 + mt.ceil(grid['height'] / 2), (i + 1) * (grid['width'] + 1) + 1, f'{houses[index(i, 1)]:^{grid['width']}}', curses.color_pair(colour))
 
+    ## Message
+    stdscr.addstr(grid['height'] * 2 + 2 + mt.ceil(grid['message'] / 2), 1, f'{caption[message]:^{(board_size + 2) * (grid['width'] + 1) - 1}}')
+
 
 def move(houses, pos):
     if houses[pos] <= 0:
-        print("Move again!")
-        return True
+        return 1
 
     i = 0
     pieces = houses[pos]
@@ -94,7 +115,7 @@ def move(houses, pos):
 
         if pieces == 0 and is_mom(pos + i) and check_empty(houses) == 'N':
             # print("One more move!")
-            return True
+            return 2
 
         if pieces == 0 and houses[spot(pos + i)] == 1 and my_house(pos, i) and houses[opposite(spot(pos + i))] > 0:
             # print("Capture!")
@@ -102,8 +123,9 @@ def move(houses, pos):
             houses[opposite(spot(pos + i))] = 0
             houses[spot(pos + i)] = 0
             houses[index(-1, (0 if pos < 7 else 1))] += piece_num
+            return 3
 
-    return False
+    return 0
 
 def check_empty(houses):
     a_win = True
@@ -165,34 +187,7 @@ def check_empty(houses):
 #     elif houses[index(-1, 0)] == houses[index(-1, 1)]:
 #         print("Tie!")
 
-def main(stdscr):
-    # houses = [
-    #     1, 2, 3, 4, 5, 4,
-    #     0,
-    #     0, 0, 1, 4, 0, 0,
-    #     9,
-    # ]
-    houses = ([4] * board_size + [0]) * 2
-    choice = 0
-
-    # while check_empty(houses) == 'N':
-    while True:
-        print_board(stdscr, houses, choice)
-        pressed = stdscr.getch()
-        match chr(pressed):
-            case 'h' | 'j' | 'a':
-                choice = (choice - 1) % board_size
-                continue
-            case 'l' | 'd':
-                choice = (choice + 1) % board_size
-                continue
-            case '\n':
-                move(houses, index(choice, 1))
-            case 'q':
-                break
-        stdscr.refresh()
-
-if __name__ == '__main__':
+def main():
     stdscr = curses.initscr()
     curses.start_color()
     curses.noecho()
@@ -202,7 +197,56 @@ if __name__ == '__main__':
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-    main(stdscr)
+    houses = [
+        0, 0, 0, 3, 0, 0,
+        0,
+        1, 0, 2, 0, 0, 0,
+        9,
+    ]
+    # houses = ([4] * board_size + [0]) * 2
+    (player, choice, message) = (True, 0, 0)
+
+    while check_empty(houses) == 'N':
+    # while True:
+        print_board(stdscr, houses, choice, message)
+        if not player:
+            cell = rd.randint(0, board_size - 1)
+            result = move(houses, index(cell, 0))
+            match result:
+                case 0 | 3:
+                    player = swap_player(player)
+                    message = 0
+        else:
+            pressed = stdscr.getch()
+            match chr(pressed):
+                case 'h' | 'j' | 'a':
+                    choice = (choice - 1) % board_size
+                    continue
+                case 'l' | 'd':
+                    choice = (choice + 1) % board_size
+                    continue
+                case '\n':
+                    result = move(houses, index(choice, 1))
+                    match result:
+                        case 0:
+                            player = swap_player(player)
+                            message = 0
+                        case 1:
+                            message = 1
+                        case 2:
+                            message = 2
+                        case 3:
+                            message = 3
+                            print_board(stdscr, houses, choice, message)
+                            stdscr.getch()
+                            player = swap_player(player)
+                case 'q':
+                    break
+        stdscr.refresh()
+
     curses.echo()
     curses.nocbreak()
     curses.endwin()
+
+if __name__ == '__main__':
+    main()
