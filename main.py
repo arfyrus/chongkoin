@@ -14,6 +14,9 @@ caption = {
     1: 'Invalid move!',
     2: 'Move again!',
     3: 'Capture! Press to continue.',
+    4: 'You won!',
+    5: 'You lost!',
+    6: 'Tie!'
 }
 
 def index(x, y):
@@ -197,13 +200,13 @@ def main():
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-    houses = [
-        0, 0, 0, 3, 0, 0,
-        0,
-        1, 0, 2, 0, 0, 0,
-        9,
-    ]
-    # houses = ([4] * board_size + [0]) * 2
+    # houses = [
+    #     0, 0, 0, 3, 0, 0,
+    #     0,
+    #     1, 0, 2, 0, 0, 0,
+    #     9,
+    # ]
+    houses = ([4] * board_size + [0]) * 2
     (player, choice, message) = (True, 0, 0)
 
     while check_empty(houses) == 'N':
@@ -244,6 +247,19 @@ def main():
                     break
         stdscr.refresh()
 
+    side = 0 if swap_player(check_empty(houses)) == 'B' else 1
+    for i in range(board_size):
+        houses[index(-1, side)] += houses[index(i, side)]
+        houses[index(i, side)] = 0
+
+    if houses[index(-1, 1)] > houses[index(-1, 0)]:
+        message = 4
+    elif houses[index(-1, 1)] > houses[index(-1, 0)]:
+        message = 5
+    else:
+        message = 6
+    print_board(stdscr, houses, -1, message)
+    stdscr.getch()
     curses.echo()
     curses.nocbreak()
     curses.endwin()
